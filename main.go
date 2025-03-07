@@ -1,18 +1,26 @@
 package main
 
 import (
-	"fmt"
 	"bufio"
+	"fmt"
 	"os"
 )
 
-func main()  {
+func main() {
 	scanner := bufio.NewScanner(os.Stdin)
+
+	callRegister()
+
 	for {
 		fmt.Print("Pokedex > ")
 		scanner.Scan()
 		lines := scanner.Text()
 		word := cleanInput(lines)[0]
-		fmt.Printf("Your command was: %s\n", word)
+		command, ok := registry[word]
+		if !ok {
+			fmt.Println("Unknown command")
+			continue
+		}
+		command.callback()
 	}
 }
