@@ -52,3 +52,38 @@ func commandMap(config *Config) error {
 
 	return nil
 }
+
+func commandPMap(config *Config) error {
+	var curURL string
+	if config.prev == "" {
+		fmt.Println("you're on the first page")
+		return nil
+	} else {
+		curURL = config.prev
+	}
+	res, err := http.Get(curURL)
+
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+
+	var areas locAreas
+	if err := json.Unmarshal(body, &areas); err != nil {
+		return err
+	}
+
+	config.next = areas.Next
+	config.prev = areas.Previous
+
+	for _, area := range areas.Results {
+		fmt.Println(area.Name)
+	}
+
+	return nil
+}

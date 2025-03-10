@@ -25,8 +25,14 @@ func callRegister() {
 
 	addRegister("map", cliCommand{
 		name:        "map",
-		description: "List the areas in Pokemon World",
+		description: "List the areas in Pokemon World (next)",
 		callback:    commandMap,
+	})
+
+	addRegister("mapb", cliCommand{
+		name:        "mapb",
+		description: "List the areas in Pokemon World (prev)",
+		callback:    commandPMap,
 	})
 
 	addRegister("exit", cliCommand{
