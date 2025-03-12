@@ -1,47 +1,59 @@
 package main
 
+import (
+	"github.com/sand94/pokedexcli/internal/pokeapi"
+)
+
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*Config) error
+	callback    func(*config) error
 }
 
-type Config struct {
-	next string
-	prev string
+type config struct {
+	pokeapiClient    pokeapi.Client
+	nextLocationsURL *string
+	prevLocationsURL *string
+	register         *commandRegister
 }
 
-var registry map[string]cliCommand
+type commandRegister struct {
+	registry map[string]cliCommand
+}
 
 // registry call for each command
-func callRegister() {
-	registry = make(map[string]cliCommand)
+func (cr *commandRegister) callRegister() {
+	cr.registry = make(map[string]cliCommand)
 
-	addRegister("help", cliCommand{
+	cr.addRegister("help", cliCommand{
 		name:        "help",
 		description: "Displays a help message",
 		callback:    commandHelp,
 	})
 
-	addRegister("map", cliCommand{
+	cr.addRegister("map", cliCommand{
 		name:        "map",
-		description: "List the areas in Pokemon World (next)",
-		callback:    commandMap,
+		description: "Get the next page of locations",
+		callback:    commandMapf,
 	})
 
-	addRegister("mapb", cliCommand{
+	cr.addRegister("mapb", cliCommand{
 		name:        "mapb",
-		description: "List the areas in Pokemon World (prev)",
-		callback:    commandPMap,
+		description: "Get the previous page of locations",
+		callback:    commandMapb,
 	})
 
-	addRegister("exit", cliCommand{
+	cr.addRegister("exit", cliCommand{
 		name:        "exit",
 		description: "Exit the Pokedex",
 		callback:    commandExit,
 	})
 }
 
-func addRegister(name string, command cliCommand) {
-	registry[name] = command
+func (cr *commandRegister) addRegister(name string, command cliCommand) {
+	cr.registry[name] = command
+}
+
+func (cr commandRegister) getCommands() map[string]cliCommand {
+	return cr.registry
 }

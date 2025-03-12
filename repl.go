@@ -7,25 +7,32 @@ import (
 	"strings"
 )
 
-const URL = "https://pokeapi.co/api/v2/"
-
-func startRepl() {
+func startRepl(cfg *config) {
 	scanner := bufio.NewScanner(os.Stdin)
-
-	callRegister()
-	config := Config{next: "", prev: ""}
+	register := commandRegister{}
+	register.callRegister()
+	cfg.register = &register
 
 	for {
 		fmt.Print("Pokedex > ")
 		scanner.Scan()
-		lines := scanner.Text()
-		word := cleanInput(lines)[0]
-		command, ok := registry[word]
+
+		words := cleanInput(scanner.Text())
+		if len(words) == 0 {
+			continue
+		}
+
+		commandName := words[0]
+		command, ok := cfg.register.getCommands()[commandName]
+
 		if !ok {
 			fmt.Println("Unknown command")
 			continue
 		}
-		command.callback(&config)
+
+		if err := command.callback(cfg); err != nil {
+			fmt.Println(err)
+		}
 	}
 
 }
